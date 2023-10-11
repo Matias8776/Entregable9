@@ -1,132 +1,36 @@
-import ProductManager from "../dao/mongoDb/ProductManager.js";
-import CartManager from "../dao/mongoDb/CartManager.js";
 import { Router } from "express";
-import __dirname from "../utils.js";
+import {
+    cart,
+    chat,
+    login,
+    notFound,
+    privateAccess,
+    productById,
+    products,
+    publicAccess,
+    realtimeproducts,
+    register,
+    resetPassword,
+} from "../controllers/views.js";
 
 const router = Router();
 
-const productManager = new ProductManager();
-const cartManager = new CartManager();
+router.get("/", publicAccess, login);
 
-const publicAccess = (req, res, next) => {
-    if (req.session.user) {
-        return res.redirect("/products");
-    }
-    next();
-};
+router.get("/register", publicAccess, register);
 
-const privateAccess = (req, res, next) => {
-    if (!req.session.user) {
-        return res.status(403).redirect("/");
-    }
-    next();
-};
+router.get("/realtimeproducts", realtimeproducts);
 
-router.get("/", publicAccess, (req, res) => {
-    const message = req.session.messages;
-    res.render("login", {
-        message: message,
-        style: "login.css",
-        title: "Ecommerce - Iniciar sesión",
-    });
-    delete req.session.messages;
-});
+router.get("/chat", chat);
 
-router.get("/register", publicAccess, (req, res) => {
-    const message = req.session.messages;
-    res.render("register", {
-        message: message,
-        style: "register.css",
-        title: "Ecommerce - Registro",
-    });
-    delete req.session.messages;
-});
+router.get("/products", privateAccess, products);
 
-router.get("/realtimeproducts", (req, res) => {
-    res.render("realTimeProducts", {
-        style: "realTimeProducts.css",
-        title: "Ecommerce - Productos en tiempo real",
-    });
-});
+router.get("/products/:pid", privateAccess, productById);
 
-router.get("/chat", (req, res) => {
-    res.render("chat", {
-        style: "chat.css",
-        title: "Ecommerce - Chat",
-    });
-});
+router.get("/carts/:cid", privateAccess, cart);
 
-router.get("/products", privateAccess, async (req, res) => {
-    const limit = req.query.limit;
-    const page = req.query.page;
-    const category = req.query.category;
-    const disponibility = req.query.disponibility;
-    let sort = req.query.sort;
+router.get("/resetPassword", publicAccess, resetPassword);
 
-    if (sort === "asc") {
-        sort = 1;
-    } else if (sort === "desc") {
-        sort = -1;
-    }
-
-    const products = await productManager.getProducts(
-        limit || 10,
-        page || 1,
-        category,
-        disponibility,
-        sort
-    );
-
-    if (products.totalPages < page) {
-        res.render("404", { style: "404.css", title: "Ecommerce - 404" });
-        return;
-    }
-
-    const plainProducts = products.docs.map((doc) => doc.toObject());
-    res.render("products", {
-        cart: req.session.user.cart,
-        products,
-        plainProducts,
-        user: req.session.user,
-        style: "products.css",
-        title: "Ecommerce - Productos",
-    });
-});
-
-router.get("/products/:pid", privateAccess, async (req, res) => {
-    const pid = req.params.pid;
-    const plainProduct = await productManager.getProductById(pid);
-    res.render("product", {
-        cart: req.session.user.cart,
-        user: req.session.user,
-        plainProduct,
-        style: "product.css",
-        title: `Ecommerce - ${plainProduct.title}`,
-    });
-});
-
-router.get("/carts/:cid", privateAccess, async (req, res) => {
-    const cid = req.params.cid;
-    const cart = await cartManager.getCartById(cid);
-    const plainProducts = cart.products;
-    const quantity = cart.quantity;
-    res.render("carts", {
-        quantity: quantity,
-        plainProducts,
-        style: "carts.css",
-        title: "Ecommerce - Carrito",
-    });
-});
-
-router.get("/resetPassword", publicAccess, (req, res) => {
-    res.render("resetPassword", {
-        style: "resetPassword.css",
-        title: "Ecommerce - Restaurar contraseña",
-    });
-});
-
-router.use((req, res) => {
-    res.render("404", { style: "404.css", title: "Ecommerce - 404" });
-});
+router.use(notFound);
 
 export default router;
