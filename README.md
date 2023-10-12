@@ -6,66 +6,65 @@
 
 ###
 
--   git clone https://github.com/Matias8776/Entregable8.git
--   cd Entregable8
--   npm i
--   npm start
-
+- git clone https://github.com/Matias8776/Entregable8.git
+- cd Entregable8
+- npm i
+- npm start
 
 ## Vista de productos:
 
 ###
 
--   http://localhost:8080/products
+- http://localhost:8080/products
 
--   Parámetros(opcionales):
-    ?limit=5,
-    ?page=2,
-    ?category=electronica,
-    ?sort=asc o desc,
-    ?disponibility=1 o 0
+- Parámetros(opcionales):
+  ?limit=5,
+  ?page=2,
+  ?category=electronica,
+  ?sort=asc o desc,
+  ?disponibility=1 o 0
 
 ## Vista de carrito por ID:
 
 ###
 
--   http://localhost:8080/carts/:cid
+- http://localhost:8080/carts/:cid
 
 ## Chat:
 
 ###
 
--   http://localhost:8080/chat
+- http://localhost:8080/chat
 
 ## Productos en tiempo real:
 
 ###
 
--   http://localhost:8080/realtimeproducts
+- http://localhost:8080/realtimeproducts
 
 ## Mostrar productos:
 
 ###
 
--   GET localhost:8080/api/products
+- GET localhost:8080/api/products
 
 ## Buscar producto por ID:
 
 ###
 
--   GET localhost:8080/api/products/:pid
+- GET localhost:8080/api/products/:pid
 
 ## Mostrar productos con limite:
 
 ###
 
--   GET localhost:8080/api/products?limit=
+- GET localhost:8080/api/products?limit=
 
 ## Agregar producto:
 
 ###
 
--   POST localhost:8080/api/products
+- POST localhost:8080/api/products
 
 ```javascript
 {
@@ -83,7 +82,7 @@
 
 ###
 
--   PUT localhost:8080/api/products/:pid
+- PUT localhost:8080/api/products/:pid
 
 ```javascript
 {
@@ -95,50 +94,50 @@
 
 ###
 
--   DELETE localhost:8080/api/products/:pid
+- DELETE localhost:8080/api/products/:pid
 
 ## Crear carrito:
 
 ###
 
--   POST localhost:8080/api/carts
+- POST localhost:8080/api/carts
 
 ## Agregar producto a carrito:
 
 ###
 
--   POST localhost:8080/api/carts/:cid/product/:pid
+- POST localhost:8080/api/carts/:cid/product/:pid
 
 ## Buscar carrito por ID:
 
 ###
 
--   GET localhost:8080/api/carts/:cid
+- GET localhost:8080/api/carts/:cid
 
 ## Actualizar carrito entero:
 
 ###
 
--   PUT localhost:8080/api/carts/:cid
+- PUT localhost:8080/api/carts/:cid
 
 ```javascript
 [
   {
-    "_id": {"_id" : "64fca344bc7da40deee9e304"},
-    "quantity": 1
+    _id: { _id: '64fca344bc7da40deee9e304' },
+    quantity: 1
   },
   {
-    "_id": {"_id" : "64fca344bc7da40deee9e305"},
-    "quantity": 14
+    _id: { _id: '64fca344bc7da40deee9e305' },
+    quantity: 14
   }
-]
+];
 ```
 
 ## Actualizar cantidad de un producto en carrito:
 
 ###
 
--   PUT localhost:8080/api/carts/:cid/products/:pid
+- PUT localhost:8080/api/carts/:cid/products/:pid
 
 ```javascript
 {
@@ -150,12 +149,10 @@
 
 ###
 
--   DELETE localhost:8080/api/carts/:cid/products/:pid
+- DELETE localhost:8080/api/carts/:cid/products/:pid
 
 ## Vaciar Carrito:
 
 ###
 
--   DELETE localhost:8080/api/carts/:cid
-
-
+- DELETE localhost:8080/api/carts/:cid

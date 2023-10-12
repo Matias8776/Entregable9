@@ -1,202 +1,201 @@
-import CartManager from "../dao/mongoDb/CartManager.js";
-import ProductManager from "../dao/mongoDb/ProductManager.js";
+import CartManager from '../dao/mongoDb/CartManager.js';
+import ProductManager from '../dao/mongoDb/ProductManager.js';
 
 const cartManager = new CartManager();
 const productManager = new ProductManager();
 
 export const addCart = async (req, res) => {
-    const cart = await cartManager.addCart();
+  const cart = await cartManager.addCart();
 
-    res.send({ status: "success", message: `Creado con el id: ${cart._id}` });
+  res.send({ status: 'success', message: `Creado con el id: ${cart._id}` });
 };
 
 export const getCarts = async (req, res) => {
-    const carts = await cartManager.getCarts();
+  const carts = await cartManager.getCarts();
 
-    if (carts.length == 0) {
-        res.status(404).send({
-            status: "error",
-            message: `No existen carritos`,
-        });
-        return;
-    }
+  if (carts.length === 0) {
+    res.status(404).send({
+      status: 'error',
+      message: 'No existen carritos'
+    });
+    return;
+  }
 
-    res.send(carts);
+  res.send(carts);
 };
 
 export const getCartById = async (req, res) => {
-    const cid = req.params.cid;
-    const cart = await cartManager.getCartById(cid);
+  const cid = req.params.cid;
+  const cart = await cartManager.getCartById(cid);
 
-    if (!cart) {
-        res.status(404).send({
-            status: "error",
-            message: `No existe el carrito con el id ${cid}`,
-        });
-        return;
-    } else if (cart.products.length == 0) {
-        res.send("El carrito esta vacío");
-    } else {
-        res.send(cart);
-    }
+  if (!cart) {
+    res.status(404).send({
+      status: 'error',
+      message: `No existe el carrito con el id ${cid}`
+    });
+  } else if (cart.products.length === 0) {
+    res.send('El carrito esta vacío');
+  } else {
+    res.send(cart);
+  }
 };
 
 export const addProductToCart = async (req, res) => {
-    const pid = req.params.pid;
-    const cid = req.params.cid;
-    const product = await productManager.getProductById(pid);
-    const cart = await cartManager.getCartById(cid);
+  const pid = req.params.pid;
+  const cid = req.params.cid;
+  const product = await productManager.getProductById(pid);
+  const cart = await cartManager.getCartById(cid);
 
-    if (!product) {
-        res.status(404).send({
-            status: "error",
-            message: `No existe el producto con el id ${pid}`,
-        });
-        return;
-    }
+  if (!product) {
+    res.status(404).send({
+      status: 'error',
+      message: `No existe el producto con el id ${pid}`
+    });
+    return;
+  }
 
-    if (!cart) {
-        res.status(404).send({
-            status: "error",
-            message: `No existe el carrito con el id ${cid}`,
-        });
-        return;
-    }
-    await cartManager.addProductToCart(cid, pid);
+  if (!cart) {
+    res.status(404).send({
+      status: 'error',
+      message: `No existe el carrito con el id ${cid}`
+    });
+    return;
+  }
+  await cartManager.addProductToCart(cid, pid);
 
-    res.send({ status: "success" });
+  res.send({ status: 'success' });
 };
 
 export const deleteProductInCart = async (req, res) => {
-    const pid = req.params.pid;
-    const cid = req.params.cid;
-    const product = await productManager.getProductById(pid);
-    const cart = await cartManager.getCartById(cid);
+  const pid = req.params.pid;
+  const cid = req.params.cid;
+  const product = await productManager.getProductById(pid);
+  const cart = await cartManager.getCartById(cid);
 
-    if (!product) {
-        res.status(404).send({
-            status: "error",
-            message: `No existe el producto con el id ${pid}`,
-        });
-        return;
-    }
+  if (!product) {
+    res.status(404).send({
+      status: 'error',
+      message: `No existe el producto con el id ${pid}`
+    });
+    return;
+  }
 
-    if (!cart) {
-        res.status(404).send({
-            status: "error",
-            message: `No existe el carrito con el id ${cid}`,
-        });
-        return;
-    }
+  if (!cart) {
+    res.status(404).send({
+      status: 'error',
+      message: `No existe el carrito con el id ${cid}`
+    });
+    return;
+  }
 
-    const productIndex = cart.products.findIndex(
-        (product) => product._id._id == pid
-    );
+  const productIndex = cart.products.findIndex(
+    (product) => product._id._id === pid
+  );
 
-    if (productIndex === -1) {
-        res.status(404).send({
-            status: "error",
-            message: `Producto no encontrado en el carrito`,
-        });
-        return;
-    }
+  if (productIndex === -1) {
+    res.status(404).send({
+      status: 'error',
+      message: 'Producto no encontrado en el carrito'
+    });
+    return;
+  }
 
-    await cartManager.deleteProductInCart(cart._id, product._id);
+  await cartManager.deleteProductInCart(cart._id, product._id);
 
-    res.send({ status: "success" });
+  res.send({ status: 'success' });
 };
 
 export const updateCart = async (req, res) => {
-    const cid = req.params.cid;
-    const cart = await cartManager.getCartById(cid);
-    if (!cart) {
-        res.status(404).send({
-            status: "error",
-            message: `No existe el carrito con el id ${cid}`,
-        });
-        return;
+  const cid = req.params.cid;
+  const cart = await cartManager.getCartById(cid);
+  if (!cart) {
+    res.status(404).send({
+      status: 'error',
+      message: `No existe el carrito con el id ${cid}`
+    });
+    return;
+  }
+
+  const updateCart = req.body;
+  const errors = [];
+
+  for (const prod of updateCart) {
+    const existProd = await productManager.getProductById(prod._id._id);
+    if (!existProd) {
+      errors.push({
+        status: 'error',
+        message: `No existe el producto con el id ${prod._id._id}`
+      });
     }
+  }
 
-    const updateCart = req.body;
-    const errors = [];
+  if (errors.length > 0) {
+    res.status(404).send(errors);
+    return;
+  }
 
-    for (const prod of updateCart) {
-        const existProd = await productManager.getProductById(prod._id._id);
-        if (!existProd) {
-            errors.push({
-                status: "error",
-                message: `No existe el producto con el id ${prod._id._id}`,
-            });
-        }
-    }
-
-    if (errors.length > 0) {
-        res.status(404).send(errors);
-        return;
-    }
-
-    await cartManager.updateCart(cart._id, updateCart);
-    const updatedCart = await cartManager.getCartById(cid);
-    res.send(updatedCart);
+  await cartManager.updateCart(cart._id, updateCart);
+  const updatedCart = await cartManager.getCartById(cid);
+  res.send(updatedCart);
 };
 
 export const updateProductQuantityInCart = async (req, res) => {
-    const pid = req.params.pid;
-    const cid = req.params.cid;
-    const product = await productManager.getProductById(pid);
-    const cart = await cartManager.getCartById(cid);
+  const pid = req.params.pid;
+  const cid = req.params.cid;
+  const product = await productManager.getProductById(pid);
+  const cart = await cartManager.getCartById(cid);
 
-    if (!product) {
-        res.status(404).send({
-            status: "error",
-            message: `No existe el producto con el id ${pid}`,
-        });
-        return;
-    }
+  if (!product) {
+    res.status(404).send({
+      status: 'error',
+      message: `No existe el producto con el id ${pid}`
+    });
+    return;
+  }
 
-    if (!cart) {
-        res.status(404).send({
-            status: "error",
-            message: `No existe el carrito con el id ${cid}`,
-        });
-        return;
-    }
+  if (!cart) {
+    res.status(404).send({
+      status: 'error',
+      message: `No existe el carrito con el id ${cid}`
+    });
+    return;
+  }
 
-    const productIndex = cart.products.findIndex(
-        (product) => product._id._id == pid
-    );
+  const productIndex = cart.products.findIndex(
+    (product) => product._id._id === pid
+  );
 
-    if (productIndex === -1) {
-        res.status(404).send({
-            status: "error",
-            message: `Producto no encontrado en el carrito`,
-        });
-        return;
-    }
+  if (productIndex === -1) {
+    res.status(404).send({
+      status: 'error',
+      message: 'Producto no encontrado en el carrito'
+    });
+    return;
+  }
 
-    const updateQuantity = req.body;
-    await cartManager.updateProductQuantityInCart(
-        cart._id,
-        product._id,
-        updateQuantity
-    );
-    const updatedCart = await cartManager.getCartById(cid);
-    res.send(updatedCart);
+  const updateQuantity = req.body;
+  await cartManager.updateProductQuantityInCart(
+    cart._id,
+    product._id,
+    updateQuantity
+  );
+  const updatedCart = await cartManager.getCartById(cid);
+  res.send(updatedCart);
 };
 
 export const deleteProductsInCart = async (req, res) => {
-    const cid = req.params.cid;
-    const cart = await cartManager.getCartById(cid);
+  const cid = req.params.cid;
+  const cart = await cartManager.getCartById(cid);
 
-    if (!cart) {
-        res.status(404).send({
-            status: "error",
-            message: `No existe el carrito con el id ${cid}`,
-        });
-        return;
-    }
+  if (!cart) {
+    res.status(404).send({
+      status: 'error',
+      message: `No existe el carrito con el id ${cid}`
+    });
+    return;
+  }
 
-    await cartManager.deleteProductsInCart(cart._id);
+  await cartManager.deleteProductsInCart(cart._id);
 
-    res.send({ status: "success" });
+  res.send({ status: 'success' });
 };
